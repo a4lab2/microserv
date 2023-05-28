@@ -12,10 +12,11 @@ app=FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8001"],
+    allow_origins=["http://localhost:3000","http://localhost:"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 redis=get_redis_connection(
     host=ENDPOINT,
@@ -24,8 +25,7 @@ redis=get_redis_connection(
     decode_response=True
 )
 
-
-app.add_middleware( CORSMiddleware)
+# app.add_middleware( CORSMiddleware)
 
 class Product(HashModel):
     name:str
@@ -36,8 +36,8 @@ class Product(HashModel):
         database=redis
 
 
-@app.get("/")
-async def root():
+@app.get("/products")
+async def all():
     return [format(pk) for pk in Product.all_pks()]
 
 
@@ -51,7 +51,7 @@ def format(pk:str):
         'quantity':p.quantity,
     }
 
-@app.post("/product")
+@app.post("/products")
 async def create(p:Product):
     return p.save()
 
@@ -61,6 +61,6 @@ async def get(pk:str):
     return Product.get(pk)
 
 
-@app.delete("/product/{pk}")
+@app.delete("/products/{pk}")
 async def delete(pk:str):
     return Product.delete(pk)

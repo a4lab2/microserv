@@ -13,9 +13,10 @@ PORT=config("PORT")
 app=FastAPI()
 
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8000"],
+    allow_origins=["http://localhost:3000","http://localhost:8000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -30,9 +31,7 @@ redis=get_redis_connection(
 
 
 
-
-app.add_middleware( CORSMiddleware)
-
+# app.add_middleware( CORSMiddleware)
 class Order(HashModel):
     product_id:str
     price:float
@@ -44,17 +43,12 @@ class Order(HashModel):
     class Meta:
         database=redis
 
-
-
 @app.post("/orders")
 async def create_order(request: Request,bg:BackgroundTasks):
     body = await request.json()
-    
     req = requests.get('http://localhost:8000/products/%s' %body['id'])
     product= req.json()
-
     order=Order(
-
         product_id=body['id'],
         price=product['price'],
         fee=0.2* product['price'],
@@ -63,11 +57,8 @@ async def create_order(request: Request,bg:BackgroundTasks):
         status='pending',
     )
     order.save()
-
     bg.add_task(complete_order,order)
-
     return order
-
 
 async def complete_order(order:Order):
     order.status='completed'
