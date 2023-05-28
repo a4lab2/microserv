@@ -41,8 +41,6 @@ const Orders = () => {
                     <input type="number" onChange={e => setquantity(e.target.value)} class="form-control" id="exampleInputPassword1" />
                 </div>
 
-
-
                 <button type="submit" class="btn btn-primary">Buy</button>
             </form>
         </Wrapper>

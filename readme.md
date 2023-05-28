@@ -1,0 +1,1 @@
+Microservice implementation with redis and fastapi. React for simple frontend.
